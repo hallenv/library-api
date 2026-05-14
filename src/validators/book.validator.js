@@ -11,7 +11,9 @@ export const bookValidatationRules = [
         .notEmpty().withMessage('CAMPO VAZIO'),
 
     body('genero')
-        .isInt({ min: 0 }).withMessage('DEVE SER NUMERO INTEIRO POSITIVO'),
+        .isString().withMessage('DEVE SER TEXTO')
+        .trim()
+        .notEmpty().withMessage('CAMPO VAZIO'),
 
     verifyErrors
 ];
@@ -30,7 +32,9 @@ export const bookUpdateValidationRules = [
 
     body('genero')
         .optional()
-        .isInt({ min: 0 }).withMessage('DEVE SER NUMERO INTEIRO POSITIVO'),
+        .isString().withMessage('DEVE SER TEXTO')
+        .trim()
+        .notEmpty().withMessage('CAMPO VAZIO'),
 
     body('writerId')
         .optional()
