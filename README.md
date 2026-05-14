@@ -1,6 +1,6 @@
 # 📚 Library API
 
-Uma API desenvolvida em Node.js com Express para ensinar conceitos essenciais e boas práticas de desenvolvimento de APIs. Criada para o curso de Desenvolvimento Web Backend na UFRN, ministrado pelo Professor Diego .
+Uma API desenvolvida em Node.js com Express para ensinar conceitos essenciais e boas práticas de desenvolvimento de APIs. Criada para o curso de Desenvolvimento Web Backend na UFRN, ministrado pelo Professor Diego Rodrigo.
 
 ## 📦 Pré-requisitos
 
