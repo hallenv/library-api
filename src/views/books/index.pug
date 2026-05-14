@@ -1,0 +1,42 @@
+doctype html
+html(lang="pt-BR")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title Lista de Livros
+    style.
+      body { font-family: Arial, sans-serif; margin: 24px; background: #f7f7f7; color: #333; }
+      h1 { margin-bottom: 16px; }
+      table { width: 100%; border-collapse: collapse; background: #fff; }
+      th, td { padding: 12px 10px; border: 1px solid #ddd; text-align: left; }
+      th { background: #007acc; color: white; }
+      tr:nth-child(even) { background: #f3f6fb; }
+      .empty { margin-top: 12px; font-style: italic; }
+      .footer { margin-top: 18px; }
+      a { color: #007acc; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+  body
+    h1 Lista de Livros
+    if books && books.length
+      table
+        thead
+          tr
+            th ID
+            th Título
+            th Ano
+            th Gênero
+            th Autor ID
+        tbody
+          each book in books
+            tr
+              td #{book.id}
+              td #{book.titulo}
+              td #{book.ano}
+              td #{book.genero}
+              td #{book.writerId}
+    else
+      p.empty Nenhum livro encontrado.
+    div.footer
+      p
+        | Veja os dados em JSON em
+        a(href="/api/books") /api/books
