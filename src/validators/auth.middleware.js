@@ -2,15 +2,9 @@ import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'sua_chave_secreta_super_segura';
 
-/**
- * Middleware de autenticação
- * Verifica se o token JWT é válido
- * Se válido, adiciona os dados do usuário em req.user
- * Se inválido, retorna erro 401
- */
 export const authenticate = (req, res, next) => {
     try {
-        // Extrai o token do header Authorization
+        // extrai token do header authorization
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
@@ -19,10 +13,10 @@ export const authenticate = (req, res, next) => {
             });
         }
 
-        // Verifica e decodifica o token
+        // verificar e decodificar token
         const decoded = jwt.verify(token, SECRET_KEY);
 
-        // Adiciona dados do usuário ao request para uso posterior
+        // adc dados do usuário ao request para uso posterior
         req.user = decoded;
 
         next();
@@ -39,10 +33,7 @@ export const authenticate = (req, res, next) => {
     }
 };
 
-/**
- * Middleware de autorização (opcional)
- * Você pode criar middleware mais específicos para diferentes permissões
- */
+
 export const authorize = (roles = []) => {
     return (req, res, next) => {
         if (!req.user) {
@@ -51,9 +42,12 @@ export const authorize = (roles = []) => {
             });
         }
 
-        // Aqui você poderia verificar roles/permissões do usuário
-        // Por exemplo: if (!roles.includes(req.user.role)) { ... }
+        if (roles.length === 0 || roles.includes(req.user.role)) {
+            return next();
+        }
 
-        next();
+        return res.status(403).json({
+            error: 'Acesso negado. Permissão insuficiente.'
+        });
     };
 };

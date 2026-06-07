@@ -2,9 +2,9 @@ import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'sua_chave_secreta_super_segura'; // Use variável de ambiente em produção
 
-// Simulando banco de dados de usuários (em produção, consulte um banco real)
+// simulando banco de dados de usuário 
 const users = [
-    { id: 1, email: 'admin@library.com', password: '123456' }
+    { id: 1, email: 'admin@library.com', password: '123456', role: 'admin' }
 ];
 
 export const register = (req, res) => {
@@ -25,18 +25,19 @@ export const register = (req, res) => {
             });
         }
 
-        // Cria novo usuário
+        // Cria novo usuário como client por padrão
         const newUser = {
             id: users.length + 1,
             email,
-            password // Em produção, criptografe a senha com bcrypt
+            password, // criptografar a senha com bcrypt
+            role: 'client'
         };
 
         users.push(newUser);
 
         res.status(201).json({
             message: 'Usuário registrado com sucesso',
-            user: { id: newUser.id, email: newUser.email }
+            user: { id: newUser.id, email: newUser.email, role: newUser.role }
         });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao registrar usuário' });
@@ -61,9 +62,9 @@ export const login = (req, res) => {
             });
         }
 
-        // Gera token JWT
+        // Gera token JWT com role
         const token = jwt.sign(
-            { id: user.id, email: user.email },
+            { id: user.id, email: user.email, role: user.role },
             SECRET_KEY,
             { expiresIn: '24h' }
         );
@@ -71,7 +72,7 @@ export const login = (req, res) => {
         res.status(200).json({
             message: 'Login realizado com sucesso',
             token,
-            user: { id: user.id, email: user.email }
+            user: { id: user.id, email: user.email, role: user.role }
         });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao realizar login' });

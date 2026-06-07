@@ -17,13 +17,13 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
 
-// Rotas públicas de autenticação
+// rotas pub para auth
 app.use('/api/auth', authRoutes);
 
-// Rota pública - visualizar livros
+// rota pub - ver livros
 app.get('/books', listBooksView);
 
-// Rotas protegidas - APIs que requerem autenticação
+// rotas privadas - requer auth 
 app.use('/api/books', authenticate, bookRoutes);
 app.use('/api/authors', authenticate, authorRoutes);
 

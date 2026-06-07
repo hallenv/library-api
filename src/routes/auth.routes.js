@@ -3,10 +3,10 @@ import { register, login } from '../controllers/auth.controller.js';
 
 const router = Router();
 
-// Rota pública - Registro de novo usuário
+// rota pub - registrar novo user
 router.post('/register', register);
 
-// Rota pública - Login
+// rota pub - login
 router.post('/login', login);
 
 export default router;
