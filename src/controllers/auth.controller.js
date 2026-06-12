@@ -1,13 +1,15 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'sua_chave_secreta_super_segura'; // Use variável de ambiente em produção
+const SALT_ROUNDS = 10;
 
-// simulando banco de dados de usuário 
+// simulando banco de dados de usuário
 const users = [
-    { id: 1, email: 'admin@library.com', password: '123456', role: 'admin' }
+    { id: 1, email: 'admin@library.com', password: bcrypt.hashSync('123456', SALT_ROUNDS), role: 'admin' }
 ];
 
-export const register = (req, res) => {
+export const register = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -25,11 +27,13 @@ export const register = (req, res) => {
             });
         }
 
+        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
         // Cria novo usuário como client por padrão
         const newUser = {
             id: users.length + 1,
             email,
-            password, // criptografar a senha com bcrypt
+            password: hashedPassword,
             role: 'client'
         };
 
@@ -44,7 +48,7 @@ export const register = (req, res) => {
     }
 };
 
-export const login = (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -55,8 +59,15 @@ export const login = (req, res) => {
         }
 
         // Busca usuário
-        const user = users.find(u => u.email === email && u.password === password);
+        const user = users.find(u => u.email === email);
         if (!user) {
+            return res.status(401).json({
+                error: 'Email ou senha inválidos'
+            });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
             return res.status(401).json({
                 error: 'Email ou senha inválidos'
             });
