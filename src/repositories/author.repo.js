@@ -1,21 +1,21 @@
 import db from '../data/db.js';
 
+const authorsCollection = () => db.collection('authors');
+
 class AuthorRepository {
     /**
     * @returns {array} // array de tds os autores
     */
     static async findAll() {
-        await db.read(); 
-        return db.data.authors;
+        return await authorsCollection().find().toArray();
     }
 
     /**
-    * @param {string} id 
+    * @param {string|number} id 
     * @returns {object | undefined} // undefined caso nao encontre
     */
     static async findById(id) {
-        await db.read(); 
-        return db.data.authors.find(p => p.id === id);
+        return await authorsCollection().findOne({ id });
     }
 
     /**
@@ -23,43 +23,30 @@ class AuthorRepository {
     * @returns {object} // autor criado
     */
     static async create(authorData) {
-        await db.read();
+        const lastAuthor = await authorsCollection().find().sort({ id: -1 }).limit(1).next();
+        const nextId = lastAuthor ? lastAuthor.id + 1 : 1;
         const newAuthor = {
-            id: db.data.authors.length > 0 ? Math.max(...db.data.authors.map(p => p.id)) + 1 : 1,
+            id: nextId,
             nome: authorData.nome
         };
-        db.data.authors.push(newAuthor);
-        await db.write();
+        await authorsCollection().insertOne(newAuthor);
         return newAuthor;
     }
 
     // atualizar um autor 
     static async update(id, authorData) {
-        await db.read();
-        const authorIndex = db.data.authors.findIndex(p => p.id === id);
-        if (authorIndex === -1) { 
-            return undefined;
-        }
-        const updatedAuthor = {
-            ...db.data.authors[authorIndex],
-            ...authorData,
-            id
-        };
-        db.data.authors[authorIndex] = updatedAuthor;
-        await db.write();
-        return updatedAuthor;
+        const result = await authorsCollection().findOneAndUpdate(
+            { id },
+            { $set: authorData },
+            { returnDocument: 'after' }
+        );
+        return result.value || undefined;
     }
 
     // deletar um autor
     static async delete(id) {
-        await db.read();
-        const authorIndex = db.data.authors.findIndex(p => p.id === id);
-        if (authorIndex === -1) {
-            return undefined;
-        }
-        const [deletedAuthor] = db.data.authors.splice(authorIndex, 1);
-        await db.write();
-        return deletedAuthor;
+        const result = await authorsCollection().findOneAndDelete({ id });
+        return result.value || undefined;
     }
 }
 

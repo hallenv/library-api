@@ -1,21 +1,21 @@
 import db from '../data/db.js';
 
+const booksCollection = () => db.collection('books');
+
 class BookRepository {
     /**
     * @returns {array} // array de tds os livros
     */
     static async findAll() {
-        await db.read(); 
-        return db.data.books;
+        return await booksCollection().find().toArray();
     }
 
     /**
-    * @param {string} bookId - 
+    * @param {string|number} id 
     * @returns {object | undefined} // undefined caso nao encontre
     */
     static async findById(id) {
-        await db.read(); 
-        return db.data.books.find(p => p.id === id);
+        return await booksCollection().findOne({ id });
     }
 
     /**
@@ -23,43 +23,30 @@ class BookRepository {
     * @returns {object} // livro ja criado
     */
     static async create(bookData) {
-        await db.read();
+        const lastBook = await booksCollection().find().sort({ id: -1 }).limit(1).next();
+        const nextId = lastBook ? lastBook.id + 1 : 1;
         const newBook = {
-            id: db.data.books.length > 0 ? Math.max(...db.data.books.map(p => p.id)) + 1 : 1,
+            id: nextId,
             ...bookData
         };
-        db.data.books.push(newBook);
-        await db.write();
+        await booksCollection().insertOne(newBook);
         return newBook;
     }
 
     // atualizar livro
     static async update(id, bookData) {
-        await db.read();
-        const bookIndex = db.data.books.findIndex(p => p.id === id);
-        if (bookIndex === -1) {
-            return undefined;
-        }
-        const updatedBook = {
-            ...db.data.books[bookIndex],
-            ...bookData,
-            id
-        };
-        db.data.books[bookIndex] = updatedBook;
-        await db.write();
-        return updatedBook;
+        const result = await booksCollection().findOneAndUpdate(
+            { id },
+            { $set: bookData },
+            { returnDocument: 'after' }
+        );
+        return result.value || undefined;
     }
 
     // deletar livro 
     static async delete(id) {
-        await db.read();
-        const bookIndex = db.data.books.findIndex(p => p.id === id);
-        if (bookIndex === -1) {
-            return undefined;
-        }
-        const [deletedBook] = db.data.books.splice(bookIndex, 1);
-        await db.write();
-        return deletedBook;
+        const result = await booksCollection().findOneAndDelete({ id });
+        return result.value || undefined;
     }
 }
 export default BookRepository;

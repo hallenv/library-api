@@ -1,10 +1,24 @@
-import { Low } from 'lowdb';
-import { JSONFile } from 'lowdb/node';
+import { MongoClient } from 'mongodb';
+import dotenv from 'dotenv';
 
-const defaultData = { authors: [], books: [] };
-const adapter = new JSONFile('db.json');
-const db = new Low(adapter, defaultData);
+dotenv.config();
 
-await db.read();
+const uri = process.env.MONGODB_URI;
+const dbName = process.env.MONGODB_DB;
+
+if (!uri) {
+    throw new Error('Missing MONGODB_URI in environment');
+}
+
+if (!dbName) {
+    throw new Error('Missing MONGODB_DB in environment');
+}
+
+const client = new MongoClient(uri);
+await client.connect();
+
+const db = client.db(dbName);
+
 export default db;
+export { client };
 
