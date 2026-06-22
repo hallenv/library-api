@@ -7,7 +7,6 @@ class BookRepository {
     * @returns {array} // array de tds os livros
     */
     static async findAll(filter = {}) {
-        const db = await connectToDatabase();
         return await booksCollection().find(filter).toArray();
     }
 
