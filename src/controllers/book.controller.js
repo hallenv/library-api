@@ -12,7 +12,7 @@ export const listBooksView = async (req, res, next) => {
 export const listBooks = async (req, res, next) => {
     try {
         const { writerId } = req.query;
-        const books = await BookService.getBooks(writerId);
+        const books = await BookService.getAll(writerId);
         res.status(200).json(books);
     } catch (error) {
         next(error);
