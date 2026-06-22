@@ -1,9 +1,17 @@
 import BookRepository from '../repositories/book.repo.js';
-import { BookResponseDTO } from '../dtos/book.dto.js'; 
+import { BookResponseDTO } from '../dtos/book.dto.js';
 
 class BookService {
-    static async getAll() {
-        const booksFromDB = await BookRepository.findAll();
+    static async getAll(writerId) {
+        const filter = {};
+
+        // Se o writerId for fornecido na requisição, adiciona ao filtro
+        if (writerId !== undefined && writerId !== null) {
+            filter.writerId = Number(writerId);
+        }
+
+        // Passa o objeto de filtro para o repositório
+        const booksFromDB = await BookRepository.findAll(filter);
         return booksFromDB.map(book => new BookResponseDTO(book));
     }
 
@@ -11,7 +19,7 @@ class BookService {
         const bookFromDB = await BookRepository.findById(id);
         if (!bookFromDB) {
             const error = new Error('LIVRO NAO ENCONTRADO');
-            error.statusCode = 404; 
+            error.statusCode = 404;
             throw error;
         }
         const bookDTO = new BookResponseDTO(bookFromDB);

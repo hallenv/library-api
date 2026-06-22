@@ -11,7 +11,8 @@ export const listBooksView = async (req, res, next) => {
 
 export const listBooks = async (req, res, next) => {
     try {
-        const books = await BookService.getAll();
+        const { writerId } = req.query;
+        const books = await BookService.getBooks(writerId);
         res.status(200).json(books);
     } catch (error) {
         next(error);
